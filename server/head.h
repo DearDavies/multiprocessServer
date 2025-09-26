@@ -41,10 +41,10 @@ typedef struct {
 int init_client_pool(client_t* clients, int len);
 
 /*
- * 功能：设置主进程的所有监听事件，包括 sockfd 和 池中每个子进程的 local_sockpair_fd。
+ * 功能：把要监听的读事件放入 epoll。
  * 返回值：错误返回非零值。
  */
-int add_epoll(int epoll_fd, int event_fd, client_t* clients, int len);
+int add_epoll(int epoll_fd, int event_fd);
 
 /*
  * 功能：找到空闲的子进程，并把新的客户连接交给子进程。

@@ -46,8 +46,8 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    if (add_epoll(epoll_fd, pipefd[0],NULL, 0) != 0) {
-        perror("添加管道监听事件错误");
+    if (add_epoll(epoll_fd, pipefd[0]) != 0) {
+        printf("添加管道监听事件错误\n");
         exit(EXIT_FAILURE);
     }
 
@@ -64,9 +64,16 @@ int main() {
     /*
      * 设置主进程的所有监听事件，包括 sockfd 和 池中每个子进程的 local_sockpair_fd
      */
-    if (add_epoll(epoll_fd, sockfd, clients, MAXCLIENTS) != 0) {
-        printf("添加读事件监听错误：sockfd = %d, 四个子进程\n", sockfd);
+    if (add_epoll(epoll_fd, sockfd) != 0) {
+        printf("添加读事件监听错误：sockfd = %d\n", sockfd);
         exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < MAXCLIENTS; i++) {
+        if (add_epoll(epoll_fd, clients[i].local_sockpair_fd) != 0) {
+            printf("添加读事件监听错误，%d号子进程的local_sockpair_fd（%d）\n", i + 1, clients[i].local_sockpair_fd);
+            exit(EXIT_FAILURE);
+        }
     }
 
     /*

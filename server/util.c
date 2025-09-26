@@ -28,33 +28,21 @@ int init_socket(int* socket_fd, char* ip, char* port) {
 }
 
 /*
- * 功能：设置监听事件，包括 sockfd 和 池中每个子进程的 local_sockpair_fd。
+ * 功能：把要监听的读事件放入 epoll。
  * 返回值：错误返回非零值。
  */
-int add_epoll(int epoll_fd, int event_fd, client_t* clients, int len) {
+int add_epoll(int epoll_fd, int event_fd) {
     if (epoll_fd < 0) {
-        perror("epoll_fd 小于 0");
+        printf("epoll_fd 小于 0\n");
         return -1;
     }
-    if (clients != NULL && len <= 0) {
-        perror("len <= 0 ");
-        return -1;
-    }
-    if (event_fd < 0 && clients == NULL) {
-        perror("至少要监听一个有效的读事件");
-        return -1;
+    if (event_fd < 0 ) {
+        printf("至少要监听一个有效的读事件\n");
+        return -2;
     }
     struct epoll_event event;
     event.events = EPOLLIN;
-    if (clients != NULL) {
-        for (int i = 0; i < len; i++) {
-            event.data.fd = clients[i].local_sockpair_fd;
-            epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clients[i].local_sockpair_fd, &event);
-        }
-    }
-    if (event_fd > 0) {
-        event.data.fd = event_fd;
-        epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event_fd, &event);
-    }
+    event.data.fd = event_fd;
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, event_fd, &event);
     return 0;
 }

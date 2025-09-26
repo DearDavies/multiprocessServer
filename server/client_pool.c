@@ -90,7 +90,7 @@ int son_main(int sockpair_fd) {
         return 1;
     }
     int ret = 0;
-    ret = add_epoll(epoll_fd, sockpair_fd, NULL, 0);
+    ret = add_epoll(epoll_fd, sockpair_fd);
     if (ret != 0) {
         perror("子进程设置读监听出错");
         return 2;
@@ -116,7 +116,7 @@ int son_main(int sockpair_fd) {
                             printf("子进程接收新客户端连接出错\n");
                             return 5;
                         }
-                        ret = add_epoll(epoll_fd, recved_fd, NULL, 0);
+                        ret = add_epoll(epoll_fd, recved_fd);
                         if (ret != 0) {
                             printf("子进程添加新客户端监听出错\n");
                             return 6;
